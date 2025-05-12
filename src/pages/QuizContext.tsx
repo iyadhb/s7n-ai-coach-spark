@@ -84,7 +84,7 @@ const QuizContext: React.FC = () => {
           context_role: contextData.role,
           context_industry: contextData.industry,
           context_experience_years: contextData.experience_years,
-          context_region: contextData.country_region,
+          context_country_region: contextData.country_region,
           context_ai_goals: contextData.ai_goals,
           updated_at: new Date().toISOString()
         })
