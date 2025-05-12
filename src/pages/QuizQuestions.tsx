@@ -5,22 +5,23 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
-import { Radio } from '@/components/ui/radio-group';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
+interface Option {
+  id: string;
+  option_text: string;
+}
+
 interface Question {
   id: string;
   question_text: string;
   question_number: number;
   question_format: string;
-  options: Array<{
-    id: string;
-    option_text: string;
-  }>;
+  options: Option[];
 }
 
 const QuizQuestions: React.FC = () => {
@@ -70,7 +71,16 @@ const QuizQuestions: React.FC = () => {
       }
 
       if (data && data.length > 0) {
-        setQuestions(data);
+        // Transform the data to match our Question interface
+        const formattedQuestions: Question[] = data.map(q => ({
+          id: q.id,
+          question_text: q.question_text,
+          question_number: q.question_number,
+          question_format: q.question_format,
+          options: Array.isArray(q.options) ? q.options : JSON.parse(q.options as string)
+        }));
+        
+        setQuestions(formattedQuestions);
       } else {
         toast({
           title: "No Questions Found",
@@ -95,6 +105,9 @@ const QuizQuestions: React.FC = () => {
     answer: z.string().min(1, { message: "Please select an answer" }),
   });
 
+  // Get the current question
+  const currentQuestion = questions[currentQuestionIndex];
+  
   // Set up form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -103,9 +116,6 @@ const QuizQuestions: React.FC = () => {
     },
   });
 
-  // Get the current question
-  const currentQuestion = questions[currentQuestionIndex];
-  
   // Save answer and move to next question
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     // Save the answer
