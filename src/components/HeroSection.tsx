@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
   return (
@@ -15,10 +16,12 @@ const HeroSection: React.FC = () => {
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-lg">
               Get personalized guidance, insights, and action plans tailored to your unique needs and goals.
             </p>
-            <Button className="bg-s7n-purple hover:bg-s7n-darkPurple text-white text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-              Start Your AI Discovery Quiz
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link to="/quiz">
+              <Button className="bg-s7n-purple hover:bg-s7n-darkPurple text-white text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                Start Your AI Discovery Quiz
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
             <p className="text-sm text-gray-500 mt-4">
               Take our 3-minute quiz and get your personalized coaching plan instantly.
             </p>

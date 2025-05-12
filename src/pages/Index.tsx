@@ -6,6 +6,7 @@ import FeatureSection from '@/components/FeatureSection';
 import HowItWorks from '@/components/HowItWorks';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   return (
@@ -26,9 +27,11 @@ const Index = () => {
             <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
               Take the first step toward a better you with our AI-powered coaching system designed to help you achieve your goals.
             </p>
-            <Button className="bg-white hover:bg-gray-100 text-s7n-purple hover:text-s7n-darkPurple text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-              Start Your AI Discovery Quiz
-            </Button>
+            <Link to="/quiz">
+              <Button className="bg-white hover:bg-gray-100 text-s7n-purple hover:text-s7n-darkPurple text-lg px-8 py-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                Start Your AI Discovery Quiz
+              </Button>
+            </Link>
           </div>
         </section>
       </main>
