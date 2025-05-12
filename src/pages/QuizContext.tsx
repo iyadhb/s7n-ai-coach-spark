@@ -63,16 +63,24 @@ const QuizContext: React.FC = () => {
 
     try {
       // Convert experience_years to a number before updating
-      const experienceYears = parseInt(contextData.experience_years);
+      let experienceYears: number | null = null;
+      
+      if (contextData.experience_years) {
+        // Try to extract just the numeric part if it's like "10+" or "3-5"
+        const numericPart = contextData.experience_years.match(/\d+/);
+        if (numericPart) {
+          experienceYears = parseInt(numericPart[0], 10);
+        }
+      }
 
       const { error } = await supabase
         .from('quiz_submissions')
         .update({
           context_role: contextData.role,
           context_industry: contextData.industry,
-          // Convert to a number since the database expects a number
-          context_experience_years: isNaN(experienceYears) ? null : experienceYears,
-          context_country_region: contextData.country_region,
+          // Use the parsed numeric value, or null if parsing failed
+          context_experience_years: experienceYears,
+          context_region: contextData.country_region, // Correctly map to context_region field
           context_ai_goals: contextData.ai_goals
         })
         .eq('id', submissionId);
