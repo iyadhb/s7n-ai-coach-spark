@@ -17,6 +17,9 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
   quizType: z.string().min(1, {
     message: "Please select a quiz type.",
   }),
@@ -33,19 +36,21 @@ const QuizStart: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      email: '',
       quizType: 'IND', // Default value
     },
   });
 
   // Create initial submission to Supabase
-  const createInitialSubmission = async (userName: string, selectedQuizType: string) => {
+  const createInitialSubmission = async (userName: string, userEmail: string, selectedQuizType: string) => {
     try {
       const { data, error } = await supabase
         .from('quiz_submissions')
-        .insert([{ 
-          user_name: userName, 
-          quiz_type: selectedQuizType 
-        }])
+        .insert({
+          user_name: userName,
+          user_email: userEmail,
+          quiz_type: selectedQuizType
+        })
         .select('id')
         .single();
         
@@ -73,7 +78,7 @@ const QuizStart: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const submissionId = await createInitialSubmission(data.name, data.quizType);
+      const submissionId = await createInitialSubmission(data.name, data.email, data.quizType);
       
       if (submissionId) {
         // Navigate to the context questions page
@@ -125,6 +130,25 @@ const QuizStart: React.FC = () => {
                     <FormControl>
                       <Input 
                         placeholder="Your name" 
+                        {...field} 
+                        className="text-lg p-6"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Email Address</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Your email" 
+                        type="email"
                         {...field} 
                         className="text-lg p-6"
                       />
