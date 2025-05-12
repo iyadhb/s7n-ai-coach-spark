@@ -222,20 +222,142 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_context_responses: {
+        Row: {
+          ai_goals: string | null
+          country_region: string | null
+          created_at: string | null
+          experience_years: string | null
+          id: string
+          industry: string | null
+          role: string | null
+          submission_id: string
+        }
+        Insert: {
+          ai_goals?: string | null
+          country_region?: string | null
+          created_at?: string | null
+          experience_years?: string | null
+          id?: string
+          industry?: string | null
+          role?: string | null
+          submission_id: string
+        }
+        Update: {
+          ai_goals?: string | null
+          country_region?: string | null
+          created_at?: string | null
+          experience_years?: string | null
+          id?: string
+          industry?: string | null
+          role?: string | null
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_submission"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          archetype_mapping: string | null
+          created_at: string | null
+          id: string
+          options: Json | null
+          question_format: string
+          question_number: number
+          question_text: string
+          quiz_type: string
+        }
+        Insert: {
+          archetype_mapping?: string | null
+          created_at?: string | null
+          id?: string
+          options?: Json | null
+          question_format: string
+          question_number: number
+          question_text: string
+          quiz_type: string
+        }
+        Update: {
+          archetype_mapping?: string | null
+          created_at?: string | null
+          id?: string
+          options?: Json | null
+          question_format?: string
+          question_number?: number
+          question_text?: string
+          quiz_type?: string
+        }
+        Relationships: []
+      }
+      quiz_results_content: {
+        Row: {
+          archetype_id: string
+          color_theme: string | null
+          created_at: string | null
+          growth_path: string | null
+          icon_url: string | null
+          id: string
+          insight: string | null
+          quiz_type: string
+          risk: string | null
+          shadow_of: string | null
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          archetype_id: string
+          color_theme?: string | null
+          created_at?: string | null
+          growth_path?: string | null
+          icon_url?: string | null
+          id?: string
+          insight?: string | null
+          quiz_type: string
+          risk?: string | null
+          shadow_of?: string | null
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          archetype_id?: string
+          color_theme?: string | null
+          created_at?: string | null
+          growth_path?: string | null
+          icon_url?: string | null
+          id?: string
+          insight?: string | null
+          quiz_type?: string
+          risk?: string | null
+          shadow_of?: string | null
+          summary?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       quiz_submissions: {
         Row: {
           ai_action_plan: Json | null
           ai_coaching_insight: string | null
           ai_focus_goal: string | null
           archetype_result: string | null
+          archetype_scores: Json | null
           context_ai_goals: string | null
           context_experience_years: number | null
           context_industry: string | null
           context_region: string | null
           context_role: string | null
           created_at: string | null
+          dominant_archetype: string | null
           id: string
           quiz_answers: Json | null
+          quiz_type: string | null
           user_email: string
           user_id: string | null
           user_name: string | null
@@ -245,14 +367,17 @@ export type Database = {
           ai_coaching_insight?: string | null
           ai_focus_goal?: string | null
           archetype_result?: string | null
+          archetype_scores?: Json | null
           context_ai_goals?: string | null
           context_experience_years?: number | null
           context_industry?: string | null
           context_region?: string | null
           context_role?: string | null
           created_at?: string | null
+          dominant_archetype?: string | null
           id?: string
           quiz_answers?: Json | null
+          quiz_type?: string | null
           user_email: string
           user_id?: string | null
           user_name?: string | null
@@ -262,14 +387,17 @@ export type Database = {
           ai_coaching_insight?: string | null
           ai_focus_goal?: string | null
           archetype_result?: string | null
+          archetype_scores?: Json | null
           context_ai_goals?: string | null
           context_experience_years?: number | null
           context_industry?: string | null
           context_region?: string | null
           context_role?: string | null
           created_at?: string | null
+          dominant_archetype?: string | null
           id?: string
           quiz_answers?: Json | null
+          quiz_type?: string | null
           user_email?: string
           user_id?: string | null
           user_name?: string | null

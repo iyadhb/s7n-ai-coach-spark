@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -8,11 +8,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 // Define form schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
+  }),
+  quizType: z.string().min(1, {
+    message: "Please select a quiz type.",
   }),
 });
 
@@ -20,26 +26,75 @@ type FormValues = z.infer<typeof formSchema>;
 
 const QuizStart: React.FC = () => {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Initialize form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      quizType: 'IND', // Default value
     },
   });
 
+  // Create initial submission to Supabase
+  const createInitialSubmission = async (userName: string, selectedQuizType: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('quiz_submissions')
+        .insert([{ 
+          user_name: userName, 
+          quiz_type: selectedQuizType 
+        }])
+        .select('id')
+        .single();
+        
+      if (error) {
+        console.error('Error creating initial submission:', error);
+        return null;
+      }
+      
+      if (data) { 
+        sessionStorage.setItem('currentSubmissionId', data.id);
+        sessionStorage.setItem('userName', userName);
+        sessionStorage.setItem('quizType', selectedQuizType);
+        return data.id; 
+      }
+      
+      return null;
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      return null;
+    }
+  };
+
   // Handle form submission
-  const onSubmit = (data: FormValues) => {
-    // Store name in session storage to retrieve later
-    sessionStorage.setItem('userName', data.name);
+  const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
     
-    // Navigate to the next step of the quiz (to be built later)
-    // For now, we'll just show an alert
-    alert(`Thank you, ${data.name}! The quiz will continue in the next phase.`);
-    
-    // Later we would navigate to the next part of the quiz like:
-    // navigate('/quiz/questions');
+    try {
+      const submissionId = await createInitialSubmission(data.name, data.quizType);
+      
+      if (submissionId) {
+        // Navigate to the context questions page
+        navigate('/quiz/context');
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create quiz. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -55,7 +110,7 @@ const QuizStart: React.FC = () => {
               This quiz will help us understand your needs and goals to provide personalized AI coaching guidance.
             </p>
             <p className="text-sm text-gray-500">
-              Let's start with your name so we can make this journey personal.
+              Let's start with some basic information about you.
             </p>
           </div>
           
@@ -79,11 +134,37 @@ const QuizStart: React.FC = () => {
                 )}
               />
               
+              <FormField
+                control={form.control}
+                name="quizType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Quiz Type</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a quiz type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="IND">Individual</SelectItem>
+                        <SelectItem value="BIZ">Business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <Button 
                 type="submit" 
                 className="w-full bg-s7n-purple hover:bg-s7n-darkPurple text-white text-lg py-6"
+                disabled={isSubmitting}
               >
-                Continue to Quiz
+                {isSubmitting ? "Creating Quiz..." : "Continue to Quiz"}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </form>
